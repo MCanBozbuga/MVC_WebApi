@@ -1,0 +1,90 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div id="piechart"></div>
+
+    </div>
+    <div class="col">
+        <div id="regions_div">
+
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+
+
+            $.ajax({
+                type: 'Get',
+                url: '/api/orders/GetOrdersWithCountry',
+                success: function (response) {
+
+                    const dataArray = [];
+                    $.each(response, function (i, obj) {
+
+                        dataArray.push([obj.country, obj.count])
+                    });
+
+
+                    dataArray.unshift(["Country", "Count"]);
+
+                    let data = google.visualization.arrayToDataTable(dataArray);
+
+                    let options = {
+                        title: 'My Daily Activities'
+                    };
+
+                    let chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+                    chart.draw(data, options);
+                }
+            })
+
+
+
+        }
+    </script>
+    <script type="text/javascript">
+        google.charts.load('current', {
+            'packages': ['geochart'],
+        });
+        google.charts.setOnLoadCallback(drawRegionsMap);
+
+        function drawRegionsMap() {
+
+
+            $.ajax({
+                type: 'Get',
+                url: '/api/orders/GetOrdersWithCountry',
+                success: function (response) {
+                    const dataArray = [];
+                    $.each(response, function (i, obj) {
+
+                        dataArray.push([obj.country, obj.count])
+                    });
+                    dataArray.unshift(["Country", "Count"]);
+                    let data = google.visualization.arrayToDataTable(dataArray);
+                    var options = {};
+
+                    var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+                    chart.draw(data, options);
+                }
+            })
+
+
+            
+        }
+    </script>
+
+
+}
